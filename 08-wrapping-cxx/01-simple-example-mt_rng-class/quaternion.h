@@ -5,7 +5,7 @@
 struct Vec3;
 struct Quaternion;
 const float kmQuaternionDot(const Quaternion*, const Quaternion*);
-void kmQuaternionRotationAxis(Quaternion* , const Vec3* , float );
+Quaternion* kmQuaternionRotationAxis(Quaternion* , const Vec3* , float );
 
 struct Vec3 {
   float x,y,z;
@@ -26,8 +26,8 @@ struct Quaternion {
   float dot (const Quaternion* q) {
     return kmQuaternionDot(this, q);
   }
-  void rotationAxis ( Vec3* vec, float angle ) {
-    kmQuaternionRotationAxis(this, vec, angle);
+  Quaternion* rotationAxis ( Vec3* vec, float angle ) {
+    return kmQuaternionRotationAxis(this, vec, angle);
   }
 };
 
@@ -39,16 +39,19 @@ const float kmQuaternionDot(const Quaternion* q1, const Quaternion* q2)
 			q1->z * q2->z);
 }
 
-void kmQuaternionRotationAxis(Quaternion* pOut, const Vec3* pV, float angle)
+Quaternion* kmQuaternionRotationAxis(Quaternion* q, const Vec3* pV, float angle)
 {
 	float rad = angle * 0.5f;
 	float scale	= sinf(rad);
 
-	pOut->w = cosf(rad);
-	pOut->x = pV->x * scale;
-	pOut->y = pV->y * scale;
-	pOut->z = pV->z * scale;
+  Quaternion* qout = new Quaternion(
+                                    q->w = cosf(rad), 
+                                    q->x = pV->x * scale,
+                                    q->y = pV->y * scale,
+                                    q->z = pV->z * scale
+                                    );
 
+  return qout;
 }
 
 #endif

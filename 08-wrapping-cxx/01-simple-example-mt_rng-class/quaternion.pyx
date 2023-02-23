@@ -6,7 +6,7 @@ cdef extern from "quaternion.h":
         float w,x,y,z
         Quaternion(float, float, float, float)
         float dot(const Quaternion*)
-        void rotationAxis(Vec3 *, float angle)
+        Quaternion* rotationAxis(Vec3 *, float angle)
     
     cdef cppclass Vec3:
         float x,y,z
@@ -47,6 +47,8 @@ cdef class PyVec3:
     def z(self, val):
         self._thisptr.z = val
 
+class Empty:
+    pass
 
 cdef class PyQuaternion:
     cdef Quaternion* _thisptr
@@ -93,6 +95,13 @@ cdef class PyQuaternion:
     def dot(self, PyQuaternion q):
         return self._thisptr.dot(q._thisptr)
     
+    #También podemos modificar rotationAxis en C++ para que reciba el puntero qout._thisptr
+    #y guarde el resultado de la op. Sería más limpio.
     def rotationAxis(self, PyVec3 vec, angle):
-        self._thisptr.rotationAxis(vec._thisptr, angle);
+        qout = PyQuaternion(0,0,0,0);
+        if qout._thisptr != NULL:
+            del qout._thisptr
 
+        qout._thisptr = self._thisptr.rotationAxis(vec._thisptr, angle);
+        
+        return qout
